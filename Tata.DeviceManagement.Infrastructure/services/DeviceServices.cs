@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using Tata.DeviceManagement.Application.DTOs;
 using Tata.DeviceManagement.Application.Interfaces;
 using Tata.DeviceManagement.Domain.Entities;
@@ -10,8 +6,6 @@ using Tata.DeviceManagement.Infrastructure.RepositoryInterfaces;
 
 namespace Tata.DeviceManagement.Infrastructure.services
 {
-
-
     public class DeviceService : IDeviceService
     {
         private readonly IDeviceRepository _repo;
@@ -21,36 +15,79 @@ namespace Tata.DeviceManagement.Infrastructure.services
             _repo = repo;
         }
 
-        public async Task<IEnumerable<Device>> GetAllDevicesAsync() => await _repo.GetAllAsync();
-        public async Task<Device?> GetDeviceByIdAsync(Guid id) => await _repo.GetByIdAsync(id);
-        public async Task<Device> CreateDeviceAsync(DeviceDto device)  {
-            
-            Device dev = new Device
-            {
-                DeviceId = new Guid(),
-                Name = device.Name,
-                Description = device.Description,
-                Protocol = device.Protocol,
-               
-            };
-           return await _repo.AddAsync(dev);
-        }
-        public async Task<Device> UpdateDeviceAsync(Guid id, DeviceDto device)
+        public async Task<IEnumerable<Device>> GetAllDevicesAsync()
         {
-            Device existing = await _repo.GetByIdAsync(id);
-            if (existing == null)
+            try
             {
-                // not found -> return null (caller can return 404)
-                return null;
+                return await _repo.GetAllAsync();
             }
-            existing.Name = device.Name;
-            existing.Description = device.Description;
-            existing.Protocol = device.Protocol;
-            return await _repo.UpdateAsync(existing);
-
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to fetch devices: {ex.Message}", ex);
+            }
         }
-        public async Task<bool> DeleteDeviceAsync(Guid id) => await _repo.DeleteAsync(id);
+
+        public async Task<Device?> GetDeviceByIdAsync(Guid id)
+        {
+            try
+            {
+                return await _repo.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving device with ID {id}: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<Device> CreateDeviceAsync(DeviceDto device)
+        {
+            try
+            {
+                var dev = new Device
+                {
+                    DeviceId = Guid.NewGuid(),
+                    Name = device.Name,
+                    Description = device.Description,
+                    Protocol = device.Protocol
+                };
+
+                return await _repo.AddAsync(dev);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create device: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<Device?> UpdateDeviceAsync(Guid id, DeviceDto device)
+        {
+            try
+            {
+                var existing = await _repo.GetByIdAsync(id);
+                if (existing == null) return null;
+
+                existing.Name = device.Name;
+                existing.Description = device.Description;
+                existing.Protocol = device.Protocol;
+
+                return await _repo.UpdateAsync(existing);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to update device with ID {id}: {ex.Message}", ex);
+            }
+        }
+
+        public async Task<bool> DeleteDeviceAsync(Guid id)
+        {
+            try
+            {
+                return await _repo.DeleteAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to delete device with ID {id}: {ex.Message}", ex);
+            }
+        }
     }
-
-
 }
