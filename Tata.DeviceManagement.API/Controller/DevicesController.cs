@@ -51,6 +51,15 @@ namespace Tata.DeviceManagement.API.Controller
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] DeviceDto device)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(ApiResponse<object>.FailureResponse($"Validation failed: {string.Join("; ", errors)}"));
+            }
             try
             {
                 var result = await _service.CreateDeviceAsync(device);
