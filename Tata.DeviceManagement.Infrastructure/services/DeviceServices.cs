@@ -1,4 +1,13 @@
-﻿
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CsvHelper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+
 using Microsoft.EntityFrameworkCore;
 using Tata.DeviceManagement.Application.DTOs;
 using Tata.DeviceManagement.Application.Interfaces;
@@ -11,6 +20,7 @@ namespace Tata.DeviceManagement.Infrastructure.services
     public class DeviceService : IDeviceService
     {
         private readonly IDeviceRepository _repo;
+        
         private readonly DeviceDbContext _context;
 
         public DeviceService(IDeviceRepository repo, DeviceDbContext context)
@@ -143,5 +153,40 @@ namespace Tata.DeviceManagement.Infrastructure.services
             await _context.SaveChangesAsync();
         }
 
+
+        public async Task<List<Device>> AddFromFile(Stream csvfile)
+        {
+            try
+            {
+                using var reader = new StreamReader(csvfile);
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+                var dtoList = csv.GetRecords<DeviceDto>().ToList();
+
+                var importedDeviced = dtoList.Select(x => new Device
+                {
+                    DeviceId = new Guid(),
+                    Description = x.Description,
+                    Name = x.Name,
+                    Protocol = x.Protocol
+                }).ToList();
+
+                await _repo.AddInDatabase(importedDeviced);
+
+                return importedDeviced;
+            }
+            catch (CsvHelperException csvEx)
+            {
+                throw new ApplicationException("CSV format is invalid", csvEx);
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new ApplicationException("Database error while saving devices", dbEx);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Unexpected error during import", ex);
+            }
+        } 
     }
 }

@@ -50,5 +50,12 @@ namespace Tata.DeviceManagement.Infrastructure.RepositoryServices
             await _context.SaveChangesAsync();
             return true;
         }
+
+       public async Task<bool> AddInDatabase(List<Device> device)
+        {
+            await _context.AddRangeAsync(device);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

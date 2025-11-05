@@ -48,6 +48,9 @@ namespace Tata.DeviceManagement.API.Controller
             }
         }
 
+
+
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] DeviceDto device)
         {
@@ -72,6 +75,9 @@ namespace Tata.DeviceManagement.API.Controller
             }
         }
 
+
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] DeviceDto device)
         {
@@ -89,6 +95,9 @@ namespace Tata.DeviceManagement.API.Controller
             }
         }
 
+
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -103,6 +112,45 @@ namespace Tata.DeviceManagement.API.Controller
             catch (Exception ex)
             {
                 return StatusCode(500, ApiResponse<string>.FailureResponse($"Error deleting device: {ex.Message}"));
+            }
+        }
+
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadfromFile(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Bad Csv File ");
+            }
+
+            var filePath = Path.Combine(Path.GetTempPath(), file.FileName);
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            try
+            {
+                await _service.AddFromFile(file.OpenReadStream());
+                return Ok("Device Imported Sucessfully");
+            }
+            catch (ApplicationException ex)
+            {
+                
+                return BadRequest(new
+                {
+                    message = ex.Message,
+                    details = ex.InnerException?.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    details = ex.Message
+                });
             }
         }
     }

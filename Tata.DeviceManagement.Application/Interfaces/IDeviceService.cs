@@ -17,11 +17,15 @@ namespace Tata.DeviceManagement.Application.Interfaces
         Task<Device> CreateDeviceAsync(DeviceDto device);
         Task<Device> UpdateDeviceAsync(Guid id, DeviceDto device);
         Task<bool> DeleteDeviceAsync(Guid id);
+<<<<<<< HEAD
         Task<IEnumerable<DevicePort>> GetPortsByDeviceAsync(Guid deviceId, bool activeOnly);
         Task ReplacePortSetAsync(Guid deviceId);
         Task CreateDefaultPortsForDevice(Guid deviceId, int version);
 
 
 
+=======
+        Task<List<Device>> AddFromFile(Stream csv);
+>>>>>>> fbd3a78aec7dda830a59ec7ac35311c27ea1d4b2
     }
 }
