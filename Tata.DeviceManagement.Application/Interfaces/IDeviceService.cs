@@ -17,5 +17,6 @@ namespace Tata.DeviceManagement.Application.Interfaces
         Task<Device> CreateDeviceAsync(DeviceDto device);
         Task<Device> UpdateDeviceAsync(Guid id, DeviceDto device);
         Task<bool> DeleteDeviceAsync(Guid id);
+        Task<List<Device>> AddFromFile(Stream csv);
     }
 }

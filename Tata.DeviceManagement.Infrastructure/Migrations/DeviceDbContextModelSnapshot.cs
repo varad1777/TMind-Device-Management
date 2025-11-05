@@ -43,6 +43,9 @@ namespace Tata.DeviceManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("status")
+                        .HasColumnType("int");
+
                     b.HasKey("DeviceId");
 
                     b.HasIndex("ConfigurationId");

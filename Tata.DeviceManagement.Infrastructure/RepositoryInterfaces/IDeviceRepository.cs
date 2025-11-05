@@ -14,5 +14,6 @@ namespace Tata.DeviceManagement.Infrastructure.RepositoryInterfaces
         Task<Device> AddAsync(Device device);
         Task<Device> UpdateAsync(Device device);
         Task<bool> DeleteAsync(Guid id);
+        Task<bool> AddInDatabase(List<Device> device);
     }
 }

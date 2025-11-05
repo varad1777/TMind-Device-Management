@@ -12,8 +12,8 @@ using Tata.DeviceManagement.Infrastructure.DbContext;
 namespace Tata.DeviceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(DeviceDbContext))]
-    [Migration("20251105083227_schema change")]
-    partial class schemachange
+    [Migration("20251105091639_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
