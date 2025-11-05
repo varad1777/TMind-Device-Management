@@ -12,8 +12,8 @@ using Tata.DeviceManagement.Infrastructure.DbContext;
 namespace Tata.DeviceManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(DeviceDbContext))]
-    [Migration("20251105083227_schema change")]
-    partial class schemachange
+    [Migration("20251105112344_port schema change2")]
+    partial class portschemachange2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,16 +80,14 @@ namespace Tata.DeviceManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("Tata.DeviceManagement.Domain.Entities.DevicePort", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("DeviceId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("DeviceId1")
+                    b.Property<Guid>("DeviceId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
@@ -98,17 +96,18 @@ namespace Tata.DeviceManagement.Infrastructure.Migrations
                     b.Property<int>("PortNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("RegisterAddress")
-                        .IsRequired()
+                    b.Property<int>("PortSetVersion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Register")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SignalType")
-                        .IsRequired()
+                    b.Property<string>("Signal")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeviceId1");
+                    b.HasIndex("DeviceId");
 
                     b.ToTable("DevicePorts");
                 });
@@ -126,7 +125,7 @@ namespace Tata.DeviceManagement.Infrastructure.Migrations
                 {
                     b.HasOne("Tata.DeviceManagement.Domain.Entities.Device", "Device")
                         .WithMany("Ports")
-                        .HasForeignKey("DeviceId1")
+                        .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

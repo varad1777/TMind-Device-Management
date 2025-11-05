@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Tata.DeviceManagement.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class first : Migration
+    public partial class portschemachange : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,35 +30,34 @@ namespace Tata.DeviceManagement.Infrastructure.Migrations
                 name: "Devices",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DeviceId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DeviceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Protocol = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ConfigurationId = table.Column<int>(type: "int", nullable: false)
+                    ConfigurationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Devices", x => x.Id);
+                    table.PrimaryKey("PK_Devices", x => x.DeviceId);
                     table.ForeignKey(
                         name: "FK_Devices_DeviceConfigurations_ConfigurationId",
                         column: x => x.ConfigurationId,
                         principalTable: "DeviceConfigurations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "DevicePorts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DeviceId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    DeviceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PortNumber = table.Column<int>(type: "int", nullable: false),
-                    SignalType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RegisterAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    Signal = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Register = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PortSetVersion = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,7 +66,7 @@ namespace Tata.DeviceManagement.Infrastructure.Migrations
                         name: "FK_DevicePorts_Devices_DeviceId",
                         column: x => x.DeviceId,
                         principalTable: "Devices",
-                        principalColumn: "Id",
+                        principalColumn: "DeviceId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
